@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin VB.Form FInputs 
    Caption         =   "Edit WndInputs"
-   ClientHeight    =   5295
+   ClientHeight    =   5835
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   7455
@@ -15,16 +15,32 @@ Begin VB.Form FInputs
       Strikethrough   =   0   'False
    EndProperty
    LinkTopic       =   "Form1"
-   ScaleHeight     =   5295
+   ScaleHeight     =   5835
    ScaleWidth      =   7455
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CheckBox ChkIsDelayed 
+      Caption         =   "is delayed:"
+      Height          =   375
+      Left            =   120
+      TabIndex        =   16
+      Top             =   600
+      Width           =   1695
+   End
+   Begin VB.TextBox TxtDelayTime 
+      Alignment       =   1  'Rechts
+      Height          =   375
+      Left            =   3720
+      TabIndex        =   14
+      Top             =   600
+      Width           =   2175
+   End
    Begin VB.CommandButton BtnClear 
       Caption         =   "Clear"
       Height          =   375
       Left            =   3600
       TabIndex        =   13
       ToolTipText     =   "Delete the list"
-      Top             =   600
+      Top             =   1080
       Width           =   1215
    End
    Begin VB.CommandButton BtnCancel 
@@ -33,7 +49,7 @@ Begin VB.Form FInputs
       Height          =   375
       Left            =   6000
       TabIndex        =   11
-      Top             =   480
+      Top             =   600
       Width           =   1335
    End
    Begin VB.CommandButton BtnOK 
@@ -60,7 +76,7 @@ Begin VB.Form FInputs
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Beides
       TabIndex        =   9
-      Top             =   960
+      Top             =   1440
       Width           =   3855
    End
    Begin VB.CommandButton BtnMoveDown 
@@ -69,7 +85,7 @@ Begin VB.Form FInputs
       Left            =   3120
       TabIndex        =   8
       ToolTipText     =   "Move down"
-      Top             =   2400
+      Top             =   2880
       Width           =   495
    End
    Begin VB.CommandButton BtnMoveUp 
@@ -78,7 +94,7 @@ Begin VB.Form FInputs
       Left            =   3120
       TabIndex        =   7
       ToolTipText     =   "Move up"
-      Top             =   1920
+      Top             =   2400
       Width           =   495
    End
    Begin VB.CommandButton BtnDelete 
@@ -87,7 +103,7 @@ Begin VB.Form FInputs
       Left            =   3120
       TabIndex        =   6
       ToolTipText     =   "Delete the selected object"
-      Top             =   1440
+      Top             =   1920
       Width           =   495
    End
    Begin VB.CommandButton BtnClone 
@@ -96,17 +112,17 @@ Begin VB.Form FInputs
       Left            =   3120
       TabIndex        =   5
       ToolTipText     =   "Clone the selected object"
-      Top             =   960
+      Top             =   1440
       Width           =   495
    End
    Begin VB.ListBox LstWndInputs 
-      Height          =   4140
+      Height          =   4395
       ItemData        =   "FInputs.frx":0000
       Left            =   0
       List            =   "FInputs.frx":0002
       TabIndex        =   4
       ToolTipText     =   "Select to view; doubleclick to edit"
-      Top             =   960
+      Top             =   1440
       Width           =   3135
    End
    Begin VB.CommandButton BtnNewInputHardw 
@@ -115,7 +131,7 @@ Begin VB.Form FInputs
       Left            =   2400
       TabIndex        =   12
       TabStop         =   0   'False
-      Top             =   600
+      Top             =   1080
       Width           =   1215
    End
    Begin VB.CommandButton BtnNewInputMouse 
@@ -124,7 +140,7 @@ Begin VB.Form FInputs
       Left            =   1200
       TabIndex        =   3
       ToolTipText     =   "Add New Mouse-Input"
-      Top             =   600
+      Top             =   1080
       Width           =   1215
    End
    Begin VB.CommandButton BtnNewInputKeybd 
@@ -133,23 +149,33 @@ Begin VB.Form FInputs
       Left            =   0
       TabIndex        =   2
       ToolTipText     =   "Add New Keyboard-Input"
-      Top             =   600
+      Top             =   1080
       Width           =   1215
    End
    Begin VB.TextBox TxtName 
       Height          =   375
-      Left            =   1200
+      Left            =   2040
       TabIndex        =   1
       Top             =   120
-      Width           =   4695
+      Width           =   3855
+   End
+   Begin VB.Label Label1 
+      AutoSize        =   -1  'True
+      Caption         =   "Delay time [ms]:"
+      Height          =   255
+      Left            =   2040
+      TabIndex        =   15
+      Top             =   600
+      Width           =   1395
    End
    Begin VB.Label LblName 
-      Caption         =   "Name:"
-      Height          =   375
+      AutoSize        =   -1  'True
+      Caption         =   "Name/Identifier:"
+      Height          =   255
       Left            =   120
       TabIndex        =   0
       Top             =   120
-      Width           =   855
+      Width           =   1410
    End
 End
 Attribute VB_Name = "FInputs"
@@ -158,39 +184,58 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private m_WInputs As WndInputs
+Private m_Result As VbMsgBoxResult
+Private m_Inputs As WndInputs
 
 Private Sub Form_Load()
-    'Set m_WInputs = MNew.WndInputs(Me.hwnd, GetDesktopWindow)
+    m_Result = VbMsgBoxResult.vbCancel
 End Sub
 
-Public Function ShowDialog(Obj As WndInputKeybd) As VbMsgBoxResult
-    Set m_Object = Obj.Clone
+Public Function ShowDialog(obj As WndInputs, Owner As Form) As VbMsgBoxResult
+    Set m_Inputs = obj.Clone
     UpdateView
-    Me.Show vbModal
+    Me.Show vbModal, Owner
     ShowDialog = m_Result
     If ShowDialog = vbCancel Then Exit Function
-    Obj.NewC m_Object
+    obj.NewC m_Inputs
 End Function
 
+Sub UpdateView()
+    TxtName.Text = m_Inputs.Name
+    TxtDelayTime.Text = m_Inputs.DelayTime
+    ChkIsDelayed.Value = IIf(m_Inputs.IsDelayed, vbChecked, vbUnchecked)
+    TxtDelayTime.Enabled = m_Inputs.IsDelayed
+    Dim i As Long, wi As IWndInputSender
+    For i = 0 To m_Inputs.Count - 1
+        Set wi = m_Inputs.Item(i)
+        Me.LstWndInputs.AddItem wi.Key
+    Next
+End Sub
 
+Function UpdateData() As Boolean
+    Dim bIsDelayed As Boolean: bIsDelayed = ChkIsDelayed.Value = vbChecked
+    Dim DelayTime  As Integer: TxtDelayTime.Text = MString.Double_TryParseValue(m_Inputs.DelayTime, TxtDelayTime.Text, "Please give a valid <datatype>-value for delay time: <value>", DelayTime)
+End Function
 
 Private Sub BtnNewInputKeybd_Click():    NewInput FInputKeybd, New WndInputKeybd: End Sub
 Private Sub BtnNewInputMouse_Click():    NewInput FInputMouse, New WndInputMouse: End Sub
 Private Sub BtnNewInputHardw_Click():    NewInput FInputHardw, New WndInputHardw: End Sub
+
 Private Sub NewInput(FInput, WndInput As Object)
     If FInput.ShowDialog(WndInput) = vbCancel Then Exit Sub
-    m_WInputs.Add WndInput
+    m_Inputs.Add WndInput
     Me.LstWndInputs.AddItem WndInput.Key
 End Sub
+
 Private Sub BtnClone_Click()
     If LstWndInputs.ListCount = 0 Then Exit Sub
     Dim i As Long: i = LstWndInputs.ListIndex
     If i < 0 Then i = LstWndInputs.ListCount - 1 'MsgBox "Select an object first!": Exit Sub
-    Dim ii: Set ii = m_WInputs.Item(i)
-    m_WInputs.Add ii.Clone
+    Dim ii: Set ii = m_Inputs.Item(i)
+    m_Inputs.Add ii.Clone
     Me.LstWndInputs.AddItem ii.Key
 End Sub
+
 Private Sub BtnDelete_Click()
     If LstWndInputs.ListCount = 0 Then Exit Sub
     Dim i As Long: i = LstWndInputs.ListIndex
@@ -198,6 +243,7 @@ Private Sub BtnDelete_Click()
     m_WInputs.Remove i
     UpdateView
 End Sub
+
 Private Sub BtnMoveUp_Click()
     Dim i As Long: i = LstWndInputs.ListIndex
     If i < 0 Then MsgBox "Select an object first!": Exit Sub
@@ -206,6 +252,7 @@ Private Sub BtnMoveUp_Click()
     UpdateView
     LstWndInputs.ListIndex = i - 1
 End Sub
+
 Private Sub BtnMoveDown_Click()
     Dim i As Long: i = LstWndInputs.ListIndex
     If i < 0 Then MsgBox "Select an object first!": Exit Sub
@@ -214,4 +261,27 @@ Private Sub BtnMoveDown_Click()
     UpdateView
     LstWndInputs.ListIndex = i + 1
 End Sub
+
+Private Sub LstWndInputs_Click()
+    Dim i As Long: i = LstWndInputs.ListIndex
+    If i < 0 Then Exit Sub
+    Dim obj: Set obj = m_Inputs.Item(i)
+    TxtToStr.Text = obj.ToStr
+End Sub
+Private Sub LstWndInputs_DblClick()
+    Dim i As Long: i = LstWndInputs.ListIndex
+    If i < 0 Then Exit Sub
+    Dim obj: Set obj = m_Inputs.Item(i)
+    obj.Edit
+End Sub
+
+Private Sub BtnOK_Click()
+    m_Result = VbMsgBoxResult.vbOK
+    Unload Me
+End Sub
+
+Private Sub BtnCancel_Click()
+    Unload Me
+End Sub
+
 

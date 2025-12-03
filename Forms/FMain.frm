@@ -2,8 +2,8 @@ VERSION 5.00
 Begin VB.Form FMain 
    Caption         =   "Input Actions"
    ClientHeight    =   4695
-   ClientLeft      =   120
-   ClientTop       =   765
+   ClientLeft      =   225
+   ClientTop       =   870
    ClientWidth     =   7455
    BeginProperty Font 
       Name            =   "Segoe UI"
@@ -21,15 +21,6 @@ Begin VB.Form FMain
    StartUpPosition =   3  'Windows-Standard
    Begin VB.CommandButton BtnMoveDown 
       Caption         =   "v"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   495
       Left            =   3120
       TabIndex        =   1
@@ -39,15 +30,6 @@ Begin VB.Form FMain
    End
    Begin VB.CommandButton BtnMoveUp 
       Caption         =   "^"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   495
       Left            =   3120
       TabIndex        =   2
@@ -57,15 +39,6 @@ Begin VB.Form FMain
    End
    Begin VB.CommandButton BtnDelete 
       Caption         =   "-"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   495
       Left            =   3120
       TabIndex        =   3
@@ -75,15 +48,6 @@ Begin VB.Form FMain
    End
    Begin VB.CommandButton BtnClone 
       Caption         =   "++"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   495
       Left            =   3120
       TabIndex        =   4
@@ -93,15 +57,6 @@ Begin VB.Form FMain
    End
    Begin VB.CommandButton BtnClear 
       Caption         =   "Clear"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   375
       Left            =   4800
       TabIndex        =   0
@@ -111,15 +66,6 @@ Begin VB.Form FMain
    End
    Begin VB.CommandButton BtnSend 
       Caption         =   "Send"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   375
       Left            =   3600
       TabIndex        =   5
@@ -127,34 +73,16 @@ Begin VB.Form FMain
       Top             =   0
       Width           =   1215
    End
-   Begin VB.CommandButton BtnNewInputHardw 
-      Caption         =   "+Hardware"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+   Begin VB.CommandButton BtnNewText 
+      Caption         =   "+Text"
       Height          =   375
       Left            =   2400
       TabIndex        =   6
       Top             =   0
       Width           =   1215
    End
-   Begin VB.CommandButton BtnNewInputMouse 
-      Caption         =   "+Mouse"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+   Begin VB.CommandButton BtnNewDelay 
+      Caption         =   "+Delay"
       Height          =   375
       Left            =   1200
       TabIndex        =   7
@@ -162,17 +90,8 @@ Begin VB.Form FMain
       Top             =   0
       Width           =   1215
    End
-   Begin VB.CommandButton BtnNewInputKeybd 
-      Caption         =   "+Keyboard"
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+   Begin VB.CommandButton BtnNewInputs 
+      Caption         =   "+Inputs"
       Height          =   375
       Left            =   0
       TabIndex        =   8
@@ -199,15 +118,6 @@ Begin VB.Form FMain
       Width           =   3855
    End
    Begin VB.ListBox LstWndInputs 
-      BeginProperty Font 
-         Name            =   "Segoe UI"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
       Height          =   4140
       ItemData        =   "FMain.frx":0CCA
       Left            =   0
@@ -219,6 +129,30 @@ Begin VB.Form FMain
    End
    Begin VB.Menu mnuFile 
       Caption         =   "&File"
+      Begin VB.Menu mnuFileNew 
+         Caption         =   "&New"
+      End
+      Begin VB.Menu mnuFileOpen 
+         Caption         =   "&Open..."
+      End
+      Begin VB.Menu mnuFileSave 
+         Caption         =   "&Save"
+      End
+      Begin VB.Menu mnuFileSaveAs 
+         Caption         =   "Save &As..."
+      End
+      Begin VB.Menu mnuFileSep 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuFileExit 
+         Caption         =   "E&xit"
+      End
+   End
+   Begin VB.Menu mnuHelp 
+      Caption         =   " &? "
+      Begin VB.Menu mnuHelpInfo 
+         Caption         =   "&Info"
+      End
    End
 End
 Attribute VB_Name = "FMain"
@@ -228,3 +162,29 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Sub BtnNewDelay_Click()
+    Dim idt As New WndInputDelay
+    If FInputDelay.ShowDialog(idt, Me) = vbCancel Then Exit Sub
+    MApp.CurDocument.Add idt
+End Sub
+
+Private Sub BtnNewInputs_Click()
+    Dim ipts As New WndInputs
+    If FInputs.ShowDialog(ipts, Me) = vbCancel Then Exit Sub
+    MApp.CurDocument.Add ipts
+End Sub
+
+Private Sub BtnSend_Click()
+    MApp.CurDocument.Send
+End Sub
+
+Private Sub BtnClear_Click()
+    MApp.CurDocument.Clear
+End Sub
+
+Private Sub Form_Resize()
+    Dim l As Single, t As Single, W As Single, h As Single
+    l = TxtToStr.Left:     t = TxtToStr.Top
+    W = Me.ScaleWidth - l: h = Me.ScaleHeight - t
+    If W > 0 And h > 0 Then TxtToStr.Move l, t, W, h
+End Sub

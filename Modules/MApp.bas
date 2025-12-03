@@ -2,10 +2,16 @@ Attribute VB_Name = "MApp"
 Option Explicit
 Public Declare Function GetDesktopWindow Lib "user32" () As LongPtr
 
+Private m_Doc As DocumentBin
+
 Sub Main()
     'FKeyboard.Show
     FMain.Show
 End Sub
+
+Public Property Get CurDocument() As DocumentBin
+    Set CurDocument = m_Doc
+End Property
 
 Public Function FileExists(ByVal FileName As String) As Boolean
     On Error Resume Next

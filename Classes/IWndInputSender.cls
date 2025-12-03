@@ -13,3 +13,4 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Public Sub Send(): End Sub
+Public Property Get Key() As String: End Property

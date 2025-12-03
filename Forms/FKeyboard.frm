@@ -1597,10 +1597,73 @@ Private Declare Function GetDesktopWindow Lib "user32" () As LongPtr
 
 Private Sub Form_Load()
     Me.Caption = "InputSender Keyboard, Mouse, Hardware: v" & App.Major & "." & App.Minor & "." & App.Revision
-    Set m_WInputs = MNew.WndInputs(Me.hwnd, GetDesktopWindow)
+    Set m_WInputs = MNew.WndInputs(Me.hwnd, GetDesktopWindow, "")
     'Set mWndPicker = New WndPicker: mWndPicker.New_ Timer1, BtnWndPicker
     Set mWndPicker = MNew.WndPicker(Timer1, BtnWndPicker, True)
     SetBtnKeyTooltip
+End Sub
+
+Private Sub Form_Resize()
+    Dim l As Single, t As Single, W As Single, h As Single
+    Dim b As Single: b = 2 * 8 * Screen.TwipsPerPixelX
+    FraMediaKeys.Visible = ChkShowMediaKeys.value = vbChecked
+    FraBrowserKeys.Visible = ChkShowBrowserKeys.value = vbChecked
+    FraSpecialKeys.Visible = ChkShowSpecialKeys.value = vbChecked
+    PnlF13F24.Visible = ChkShowF13F24.value = vbChecked
+    PnlCursorKeys.Visible = ChkShowCursorKeys.value = vbChecked
+    PnlNumpad.Visible = ChkShowNumpad.value = vbChecked
+    If FraMediaKeys.Visible Then
+        t = FraMediaKeys.Top
+        W = FraMediaKeys.Width: h = FraMediaKeys.Height
+        If W > 0 And h > 0 Then FraMediaKeys.Move l, t, W, h
+        l = l + W
+    End If
+    If FraBrowserKeys.Visible Then
+        t = FraBrowserKeys.Top
+        W = FraBrowserKeys.Width: h = FraBrowserKeys.Height
+        If W > 0 And h > 0 Then FraBrowserKeys.Move l, t, W, h
+        l = l + W
+    End If
+    If FraSpecialKeys.Visible Then
+        t = FraSpecialKeys.Top
+        W = FraSpecialKeys.Width: h = FraSpecialKeys.Height
+        If W > 0 And h > 0 Then FraSpecialKeys.Move l, t, W, h
+        l = l + W
+    End If
+    l = 0: t = IIf(t, t + h, FraMediaKeys.Top)
+    
+    W = PnlKeyboard.Width
+    h = PnlKeyboard.Height
+    If W > 0 And h > 0 Then PnlKeyboard.Move l, t, W, h
+    t = 0
+    l = PnlStandardKeys.Left
+    If PnlF13F24.Visible Then
+        W = PnlF13F24.Width: h = PnlF13F24.Height
+        If W > 0 And h > 0 Then PnlF13F24.Move l, t, W, h
+        t = t + h
+    End If
+    l = PnlStandardKeys.Left
+    W = PnlStandardKeys.Width
+    h = PnlStandardKeys.Height
+    PnlStandardKeys.Move l, t, W, h
+    l = PnlStandardKeys.Left + W + b
+    PnlStandardKeys.ZOrder 0
+    W = 0
+    If PnlCursorKeys.Visible Then
+        W = PnlCursorKeys.Width
+        h = PnlCursorKeys.Height
+        If W > 0 And h > 0 Then PnlCursorKeys.Move l, t, W, h
+        W = W + b
+    End If
+    l = l + W '+ b
+    If PnlNumpad.Visible Then
+        W = PnlNumpad.Width
+        h = PnlNumpad.Height
+        If W > 0 And h > 0 Then PnlNumpad.Move l, t, W, h
+    End If
+    l = TxtToStr.Left: t = TxtToStr.Top
+    W = Me.ScaleWidth - l: h = Me.ScaleHeight - t
+    If W > 0 And h > 0 Then TxtToStr.Move l, t, W, h
 End Sub
 
 Sub SetBtnKeyTooltip()
@@ -1745,14 +1808,14 @@ Private Sub ChkShowSpecialKeys_Click():    Form_Resize: End Sub
 Private Sub LstWndInputs_Click()
     Dim i As Long: i = LstWndInputs.ListIndex
     If i < 0 Then Exit Sub
-    Dim Obj: Set Obj = m_WInputs.Item(i)
-    TxtToStr.Text = Obj.ToStr
+    Dim obj: Set obj = m_WInputs.Item(i)
+    TxtToStr.Text = obj.ToStr
 End Sub
 Private Sub LstWndInputs_DblClick()
     Dim i As Long: i = LstWndInputs.ListIndex
     If i < 0 Then Exit Sub
-    Dim Obj: Set Obj = m_WInputs.Item(i)
-    Obj.Edit
+    Dim obj: Set obj = m_WInputs.Item(i)
+    obj.Edit
 End Sub
 
 Private Sub mnuFileNew_Click()
@@ -1794,9 +1857,9 @@ Private Sub BtnKey_Click(Index As Integer)
     Dim VKey1 As EVirtualKeyCodes: VKey1 = -1
     Select Case VKey0
     
-    Case EVirtualKeyCodes.VK_CAPITAL: CkShift.Value = IIf(CkShift.Value = vbChecked, vbUnchecked, vbChecked) 'just toggle
-    Case EVirtualKeyCodes.VK_NUMLOCK:   CkNum.Value = IIf(CkNum.Value = vbChecked, vbUnchecked, vbChecked)   'just toggle
-    Case EVirtualKeyCodes.VK_SCROLL:   CkRoll.Value = IIf(CkRoll.Value = vbChecked, vbUnchecked, vbChecked)  'just toggle
+    Case EVirtualKeyCodes.VK_CAPITAL: CkShift.value = IIf(CkShift.value = vbChecked, vbUnchecked, vbChecked) 'just toggle
+    Case EVirtualKeyCodes.VK_NUMLOCK:   CkNum.value = IIf(CkNum.value = vbChecked, vbUnchecked, vbChecked)   'just toggle
+    Case EVirtualKeyCodes.VK_SCROLL:   CkRoll.value = IIf(CkRoll.value = vbChecked, vbUnchecked, vbChecked)  'just toggle
     
     Case 272:         VKey0 = EVirtualKeyCodes.VK_SHIFT
                     ' Right-Shift is the same VkCode as Left-Shift = 16 , but we can not have twice the same Index
@@ -1808,7 +1871,7 @@ Private Sub BtnKey_Click(Index As Integer)
                     ' to give the CommandButton for AltGr the Index 256 + 17 = 273
     End Select
     'maybe we also need a solution for Num-Lock
-    If CkNum.Value = vbUnchecked Then
+    If CkNum.value = vbUnchecked Then
         Select Case VKey0
         Case EVirtualKeyCodes.VK_NUMPAD0: VKey0 = EVirtualKeyCodes.VK_INSERT
         Case EVirtualKeyCodes.VK_NUMPAD1: VKey0 = EVirtualKeyCodes.VK_END
@@ -1837,7 +1900,7 @@ Private Sub BtnKey_Click(Index As Integer)
 End Sub
 
 Private Sub PnlKeyboard_KeyDown(KeyCode As Integer, Shift As Integer)
-    BtnKey(KeyCode).Value = True
+    BtnKey(KeyCode).value = True
 End Sub
 
 'Private Sub Text1_KeyDown(KeyCode As Integer, Shift As Integer)
@@ -1846,68 +1909,5 @@ End Sub
 'Private Sub Text1_KeyUp(KeyCode As Integer, Shift As Integer)
 '    Debug.Print "KeyUp   KeyCode: " & KeyCode & "; Shift: " & Shift
 'End Sub
-
-Private Sub Form_Resize()
-    Dim l As Single, t As Single, W As Single, h As Single
-    Dim b As Single: b = 2 * 8 * Screen.TwipsPerPixelX
-    FraMediaKeys.Visible = ChkShowMediaKeys.Value = vbChecked
-    FraBrowserKeys.Visible = ChkShowBrowserKeys.Value = vbChecked
-    FraSpecialKeys.Visible = ChkShowSpecialKeys.Value = vbChecked
-    PnlF13F24.Visible = ChkShowF13F24.Value = vbChecked
-    PnlCursorKeys.Visible = ChkShowCursorKeys.Value = vbChecked
-    PnlNumpad.Visible = ChkShowNumpad.Value = vbChecked
-    If FraMediaKeys.Visible Then
-        t = FraMediaKeys.Top
-        W = FraMediaKeys.Width: h = FraMediaKeys.Height
-        If W > 0 And h > 0 Then FraMediaKeys.Move l, t, W, h
-        l = l + W
-    End If
-    If FraBrowserKeys.Visible Then
-        t = FraBrowserKeys.Top
-        W = FraBrowserKeys.Width: h = FraBrowserKeys.Height
-        If W > 0 And h > 0 Then FraBrowserKeys.Move l, t, W, h
-        l = l + W
-    End If
-    If FraSpecialKeys.Visible Then
-        t = FraSpecialKeys.Top
-        W = FraSpecialKeys.Width: h = FraSpecialKeys.Height
-        If W > 0 And h > 0 Then FraSpecialKeys.Move l, t, W, h
-        l = l + W
-    End If
-    l = 0: t = IIf(t, t + h, FraMediaKeys.Top)
-    
-    W = PnlKeyboard.Width
-    h = PnlKeyboard.Height
-    If W > 0 And h > 0 Then PnlKeyboard.Move l, t, W, h
-    t = 0
-    l = PnlStandardKeys.Left
-    If PnlF13F24.Visible Then
-        W = PnlF13F24.Width: h = PnlF13F24.Height
-        If W > 0 And h > 0 Then PnlF13F24.Move l, t, W, h
-        t = t + h
-    End If
-    l = PnlStandardKeys.Left
-    W = PnlStandardKeys.Width
-    h = PnlStandardKeys.Height
-    PnlStandardKeys.Move l, t, W, h
-    l = PnlStandardKeys.Left + W + b
-    PnlStandardKeys.ZOrder 0
-    W = 0
-    If PnlCursorKeys.Visible Then
-        W = PnlCursorKeys.Width
-        h = PnlCursorKeys.Height
-        If W > 0 And h > 0 Then PnlCursorKeys.Move l, t, W, h
-        W = W + b
-    End If
-    l = l + W '+ b
-    If PnlNumpad.Visible Then
-        W = PnlNumpad.Width
-        h = PnlNumpad.Height
-        If W > 0 And h > 0 Then PnlNumpad.Move l, t, W, h
-    End If
-    l = TxtToStr.Left: t = TxtToStr.Top
-    W = Me.ScaleWidth - l: h = Me.ScaleHeight - t
-    If W > 0 And h > 0 Then TxtToStr.Move l, t, W, h
-End Sub
 
 

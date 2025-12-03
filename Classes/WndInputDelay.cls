@@ -14,11 +14,38 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements IWndInputSender
 Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliSeconds As Long)
+Private m_Name    As String
 Private m_Milsecs As Long
 
-Friend Sub New_(Milliseconds As Long)
+Friend Sub New_(Name As String, Milliseconds As Long)
     m_Milsecs = Milliseconds
 End Sub
+
+Public Sub NewC(other As WndInputDelay)
+    With other
+        m_Name = other.Name
+        m_Milsecs = other.Milliseconds
+    End With
+End Sub
+
+Public Function Clone() As WndInputDelay
+    Set Clone = New WndInputDelay: Clone.NewC Me
+End Function
+
+Public Property Get Name() As String
+    Name = m_Name
+End Property
+
+Public Property Get Key() As String
+    Key = m_Name
+End Property
+
+Public Property Get Milliseconds() As Long
+    Milliseconds = m_Milsecs
+End Property
+'Public Property Let Milliseconds(ByVal value As Long)
+'    m_Milsecs = value
+'End Property
 
 Public Sub Send()
     Sleep m_Milsecs
@@ -28,4 +55,8 @@ End Sub
 Private Sub IWndInputSender_Send()
     Me.Send
 End Sub
+
+Private Property Get IWndInputSender_Key() As String
+    IWndInputSender_Key = Me.Key
+End Property
 

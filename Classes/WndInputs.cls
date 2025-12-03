@@ -99,10 +99,12 @@ Private Declare Function GetTickCount Lib "kernel32" () As Long
 Private Declare Function GetTickCount64 Lib "kernel32" () As Currency
 
 'https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow
-Private Declare Function SetForegroundWindow Lib "user32.dll" (ByVal hWnd As LongPtr) As Long
+Private Declare Function SetForegroundWindow Lib "user32.dll" (ByVal hwnd As LongPtr) As Long
 Private m_hWndSender   As LongPtr 'hwnd of window FMain in this app
 Private m_hWndReceiver As LongPtr 'hwnd of any window to send inputs to
 'Private m_Date  As Date '???
+Private m_IsDelayed As Boolean
+Private m_DelayMS   As Integer
 Private m_Count As Long
 Private m_Arr() As HKMINPUT 'IINPUT
 'Private m_TimeStamp As Long
@@ -112,8 +114,8 @@ Private Sub Class_Initialize()
     ReDim m_Arr(0 To 3)
 End Sub
 
-Friend Sub New_(Name As String, hWndSender As LongPtr, hWndReceiver As LongPtr)
- m_Name = Name:  m_hWndSender = hWndSender:          m_hWndReceiver = hWndReceiver:
+Friend Sub New_(Name As String, hWndSender As LongPtr, hWndReceiver As LongPtr, Optional ByVal IsDelayed As Boolean = False, Optional ByVal delaytime_ms As Integer = 0)
+ m_Name = Name:  m_hWndSender = hWndSender:          m_hWndReceiver = hWndReceiver: m_DelayMS = delaytime_ms: m_IsDelayed = IsDelayed
 End Sub
 
 'Copy to MNew:
@@ -123,7 +125,7 @@ End Sub
 
 Friend Sub NewC(other As WndInputs)
     With other
-        New_ .Name, .hWndSender, .hWndReceiver
+        New_ .Name, .hWndSender, .hWndReceiver, m_DelayMS
         m_Count = .Count: EnsureCapacity m_Count
         RtlMoveMemory ByVal Me.DataPtr, ByVal .DataPtr, m_Count * (24 + MPtr.SizeOf_LongPtr)
     End With
@@ -158,6 +160,18 @@ Public Property Get Name() As String
     Name = m_Name
 End Property
 
+Public Property Get IsDelayed() As Boolean
+    IsDelayed = m_IsDelayed
+End Property
+
+Public Property Get DelayTime() As Integer
+    DelayTime = m_DelayMS
+End Property
+
+Public Property Get Key() As String
+    Key = m_Name
+End Property
+    
 Function GetNextCapacity(ByVal Count As Long) As Long
     Dim sq As Double: sq = VBA.Math.Sqr(Count)
     Dim isq As Long: isq = Int(sq)
@@ -172,9 +186,9 @@ Private Sub EnsureCapacity(ByVal Count As Long)
     End If
 End Sub
 
-Public Sub Add(Obj)
+Public Sub Add(obj)
     EnsureCapacity m_Count + 1
-    Obj.Ptr = VarPtr(m_Arr(m_Count)): Obj.SetData
+    obj.Ptr = VarPtr(m_Arr(m_Count)): obj.SetData
     m_Count = m_Count + 1
 End Sub
 
@@ -270,14 +284,14 @@ End Property
 '    Set ItemIK = New WndInputKeybd: ItemIK.Ptr = VarPtr(m_Arr(Index))
 'End Property
 
-Public Sub Insert(ByVal Index As Long, Obj)
+Public Sub Insert(ByVal Index As Long, obj)
     If Index < 0 Or m_Count <= Index Then Exit Sub
     EnsureCapacity m_Count + 1
     Dim pDst As LongPtr: pDst = VarPtr(m_Arr(Index + 1))
     Dim pSrc As LongPtr: pSrc = VarPtr(m_Arr(Index))
     Dim blen As Long: blen = (m_Count - 1 - (Index)) * 28
     RtlMoveMemory ByVal pDst, ByVal pSrc, blen
-    Obj.Ptr = VarPtr(m_Arr(Index)): Obj.SetData
+    obj.Ptr = VarPtr(m_Arr(Index)): obj.SetData
     m_Count = m_Count + 1
 End Sub
 
@@ -291,17 +305,25 @@ Public Sub Remove(ByVal Index As Long)
 End Sub
 
 Public Sub Send()
+    Dim ipd As WndInputDelay: Set ipd = MNew.WndInputDelay("", m_DelayMS)
     Dim hr As Long: hr = SetForegroundWindow(m_hWndReceiver)
-    hr = SendInput(m_Count, m_Arr(0), 28)
+    If m_DelayMS Then
+        Dim i As Long, wis As IWndInputSender
+        For i = 0 To m_Count - 1
+            Set wis = Me.Item(i): wis.Send: ipd.Send
+        Next
+    Else
+        hr = SendInput(m_Count, m_Arr(0), 28)
+    End If
     'hr = SetForegroundWindow(m_hWndSender)
 End Sub
 
 Public Sub ToListBox(aLB As ListBox)
     aLB.Clear
-    Dim i As Long, Obj 'As Object
+    Dim i As Long, obj 'As Object
     For i = 0 To m_Count - 1
-        Set Obj = Me.Item(i)
-        aLB.AddItem Obj.Key
+        Set obj = Me.Item(i)
+        aLB.AddItem obj.Key
     Next
 End Sub
 
@@ -370,3 +392,9 @@ End Sub
 Private Sub IWndInputSender_Send()
     Me.Send
 End Sub
+
+Private Property Get IWndInputSender_Key() As String
+    IWndInputSender_Key = Me.Key
+End Property
+
+

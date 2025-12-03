@@ -31,10 +31,10 @@ Private Type PKEYBDINPUT
 End Type
 
 'https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-keybd_event
-Declare Sub keybd_event Lib "user32" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As LongPtr)
+Private Declare Sub keybd_event Lib "user32" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As LongPtr)
 
 'https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-oemkeyscan
-Declare Function OemKeyScan Lib "user32" (ByVal wOemChar As Long) As Long
+Private Declare Function OemKeyScan Lib "user32" (ByVal wOemChar As Long) As Long
 
 Private m_Value As PKEYBDINPUT
 Private m_Data  As KEYBDINPUT
@@ -71,8 +71,8 @@ End Property
 Public Property Get Ptr() As LongPtr
     Ptr = m_Value.SAPtr.pvData
 End Property
-Public Property Let Ptr(ByVal Value As LongPtr)
-    m_Value.SAPtr.pvData = Value
+Public Property Let Ptr(ByVal value As LongPtr)
+    m_Value.SAPtr.pvData = value
 End Property
 
 Public Sub SetData()
@@ -83,16 +83,16 @@ End Sub
 Public Property Get VirtKeyCode() As Integer
     VirtKeyCode = m_Value.arr(0).wVk
 End Property
-Public Property Let VirtKeyCode(ByVal Value As Integer)
-    m_Value.arr(0).wVk = Value
+Public Property Let VirtKeyCode(ByVal value As Integer)
+    m_Value.arr(0).wVk = value
 End Property
 
 'A hardware scan code for the key. If dwFlags specifies KEYEVENTF_UNICODE, wScan specifies a Unicode character which is to be sent to the foreground application.
 Public Property Get Scan() As Integer
     Scan = m_Value.arr(0).wScan
 End Property
-Public Property Let Scan(ByVal Value As Integer)
-    m_Value.arr(0).wScan = Value
+Public Property Let Scan(ByVal value As Integer)
+    m_Value.arr(0).wScan = value
 End Property
 
 'Specifies various aspects of a keystroke. This member can be certain combinations of the following values:
@@ -104,24 +104,24 @@ End Property
 Public Property Get Flags() As EKeyEventFlags
     Flags = m_Value.arr(0).dwFlags
 End Property
-Public Property Let Flags(ByVal Value As EKeyEventFlags)
-    m_Value.arr(0).dwFlags = Value
+Public Property Let Flags(ByVal value As EKeyEventFlags)
+    m_Value.arr(0).dwFlags = value
 End Property
 
 'The time stamp for the event, in milliseconds. If this parameter is zero, the system will provide its own time stamp.
 Public Property Get Time() As Long
     Time = m_Value.arr(0).Time
 End Property
-Public Property Let Time(ByVal Value As Long)
-    m_Value.arr(0).Time = Value
+Public Property Let Time(ByVal value As Long)
+    m_Value.arr(0).Time = value
 End Property
 
 'An additional value associated with the keystroke. Use the GetMessageExtraInfo function to obtain this information.
 Public Property Get ExtraInfo() As LongPtr
     ExtraInfo = m_Value.arr(0).dwExtraInfo
 End Property
-Public Property Let ExtraInfo(ByVal Value As LongPtr)
-    m_Value.arr(0).dwExtraInfo = Value
+Public Property Let ExtraInfo(ByVal value As LongPtr)
+    m_Value.arr(0).dwExtraInfo = value
 End Property
 
 Public Function ToStr() As String
@@ -155,3 +155,16 @@ End Sub
 'This is useful for simulating a physical keystroke regardless of which keyboard is currently being used.
 'You can also pass the KEYEVENTF_EXTENDEDKEY flag if the scan code is an extended key.
 'The virtual key value of a key can change depending on the current keyboard layout or what other keys were pressed, but the scan code will always be the same.
+
+
+' v ' ############################## ' v '    Implements IWndInputSender    ' v ' ############################## ' v '
+Private Sub IWndInputSender_Send()
+    Me.Send
+End Sub
+
+Private Property Get IWndInputSender_Key() As String
+    IWndInputSender_Key = Me.Key
+End Property
+
+
+
